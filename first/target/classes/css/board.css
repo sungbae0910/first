@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+#tableList:hover tbody tr:hover td{
+	background: #dee2e6;
+}
+
+#insertBoard{
+	float: right;
+}
+
+.btnList{
+	text-align: center;
+}
