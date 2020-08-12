@@ -1,5 +1,8 @@
 package com.first.service;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+
 public class FirstVO {
 
 	/* 글 번호 */
@@ -43,8 +46,9 @@ public class FirstVO {
 	public String getbDate() {
 		return bDate;
 	}
-	public void setbDate(String bDate) {
-		this.bDate = bDate;
+	public void setbDate(Date bDate) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		this.bDate = sdf.format(bDate);
 	}
 	public int getbCnt() {
 		return bCnt;

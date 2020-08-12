@@ -18,6 +18,11 @@
 
 <script>
 $(document).ready(function(){
+	$('#summernote').summernote({
+		toolbar : []
+	});
+	$('#summernote').summernote('disable');
+	
 	bindEvent();
 })
 	
@@ -36,22 +41,29 @@ $(document).ready(function(){
 
 <div class="container">
 	<form method="post" id="listForm">
+		<input type="hidden" name="bNo" value="${vo.bNo}"/>
+		<input type="hidden" name="guBun" value="U"/>
+		<input type="hidden" name="nowPage" id="nowPage" value="${paging.nowPage}"/>
+		<input type="hidden" name="cntPerPage" id="cntPerPage" value="${paging.cntPerPage }"/>
+		<input type="hidden" name="searchType" id="searchType" value="${paging.searchType}"/>
+		<input type="hidden" name="keyword" id="keyword" value="${paging.keyword}"/>
 		<div class="form-group row">
 			<label for="bWriter" class="col-sm-2 col-form-label">작성자</label>
 			<div class="col-sm-10">
-				<input type="text" class="form-control" id="bWriter" name="bWriter" readonly>
+				<input type="text" class="form-control" id="bWriter" name="bWriter" readonly value="${vo.bWriter}">
 			</div>
 		</div>
 		<div class="form-group row">
 			<label for="bSubject" class="col-sm-2 col-form-label">제목</label>
 			<div class="col-sm-10">
-				<input type="text" class="form-control" id="bSubject" name="bSubject" readonly>
+				<input type="text" class="form-control" id="bSubject" name="bSubject" readonly value="${vo.bSubject}">
 			</div>
 		</div>
 		<div class="form-group row">
 			<label for="bContent" class="col-sm-2 col-form-label">내용</label>
 			<div class="col-sm-10">
-    			<textarea class="form-control" id="bContent" rows="10" disabled></textarea>
+    			<!-- <textarea class="form-control" name="bContent" id="bContent" rows="10" disabled></textarea> -->
+    			<textarea id="summernote" name="editordata" >${vo.bContent}</textarea>
 			</div>
 		</div>
 	</form>	
@@ -63,7 +75,7 @@ $(document).ready(function(){
 		<div class="col">
 			<div class="btnList">
 				<button id="updateBrdView" type="button" class="btn btn-primary">수정</button>
-				<button id="deeteBrd" type="button" class="btn btn-danger">삭제</button>
+				<button id="deleteBrd" type="button" class="btn btn-danger">삭제</button>
 				<button id="brdList" type="button" class="btn btn-secondary">목록</button>
 			</div>
 		</div>

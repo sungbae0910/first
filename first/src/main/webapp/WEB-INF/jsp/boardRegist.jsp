@@ -24,12 +24,37 @@ $(document).ready(function(){
 		maxHeight: null,
 		focus: true,
 		lang: "ko-KR",
-		placeholder: "내용을 입력해주세요."
+		placeholder: "내용을 입력해주세요.",
+ 		callbacks : {
+			onImageUpload : function(files){
+				for(var i = files.length-1; i>=0; i--){
+					sendFile(files[i], this);
+				}
+			}
+		} 
 	});
 	
 	bindEvent();
 })
-	
+
+function sendFile(file, editor){
+	alert("asd");
+	var form_data = new FormData();
+	form_data.append("file", file);
+	$.ajax({
+		data : form_data,
+		dataType : "json",
+		type : "POST",
+		url : "/com/first/summernoteUpload.do",
+		enctype : "multipart/form-data",
+		contentType : false,
+		processData : false,
+		success : function(data){
+			alert(data.url);
+			$(editor).summernote('insertImage', data.url);
+		}
+	});
+} 
 </script>
 </head>
 <body>
@@ -44,7 +69,11 @@ $(document).ready(function(){
 </div>
 
 <div class="container">
-	<form method="post" id="insertForm">
+	<form method="post" id="listForm">
+		<input type="hidden" name="nowPage" id="nowPage" value="${paging.nowPage}"/>
+		<input type="hidden" name="cntPerPage" id="cntPerPage" value="${paging.cntPerPage }"/>
+		<input type="hidden" name="searchType" id="searchType" value="${paging.searchType}"/>
+		<input type="hidden" name="keyword" id="keyword" value="${paging.keyword}"/>
 		<div class="form-group row">
 			<label for="bWriter" class="col-sm-2 col-form-label">작성자</label>
 			<div class="col-sm-10">
@@ -60,7 +89,7 @@ $(document).ready(function(){
 		<div class="form-group row">
 			<label for="bContent" class="col-sm-2 col-form-label">내용</label>
 			<div class="col-sm-10">
-				<textarea id="summernote" name="editordata"></textarea>
+				<textarea id="summernote" name="bContent"></textarea>
 			</div>
 		</div>
 	</form>	
