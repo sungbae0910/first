@@ -37,7 +37,7 @@ function bindEvent(){
 		}
 	})
 	
-	/* 취소 버튼 */
+	/* 수정 취소 버튼 */
 	$("#cancelBrd").click(function(){
 		$("#listForm").attr("action", "/com/first/detailBrd.do").submit();
 	})
@@ -55,36 +55,51 @@ function bindEvent(){
 	
 	/* 검색 */
 	$("#searchBtn").click(function(){
-		selChange();
+		selChange(1);
 	})
 	
 	$("#keyword").keydown(function(key){
 		if(key.keyCode == 13){
-			selChange();
+			selChange(1);
 		}
 	})
 	
 }
 
+/*summernoteImage 등록 */
+function sendFile(file, editor){
+	var form_data = new FormData();
+	form_data.append("file", file);
+	$.ajax({
+		data : form_data,
+		dataType : "json",
+		type : "POST",
+		url : "/com/first/summernoteUpload.do",
+		enctype : "multipart/form-data",
+		contentType : false,
+		processData : false,
+		success : function(data){
+			$(editor).summernote('insertImage', data.url);
+		}
+	});
+} 
+
 function selChange(nowPage){
 	var sel = $('#sel').val();
 	var search = $('#search').val();
-	if(nowPage != null){
-		$("#nowPage").val(nowPage);
-	}
+	$("#nowPage").val(nowPage);
 	$("#cntPerPage").val(sel);
 	$('#searchType').val(search);
 	$("#listForm").attr("action", "/com/first/listBrd.do").submit();
 }
 
 function ckValue(value){
-	var pattern = /^[A-Z|a-z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+$/;
 	var bWriter = $("#bWriter").val();
 	var bSubject = $("#bSubject").val();
 	var summernote = $("#summernote").val();
-	summernote = summernote.replace(/(<([^>]+)>)/gi, "");
-	summernote = summernote.replace(/&nbsp;/gi, "");
-	summernote = summernote.trim();
+	summernote = summernote.replace(/(<([^>]+)>)/g, "");
+	summernote = summernote.replace(/&nbsp;/g, "");
+	summernote = summernote.replace(/ /g, "");
 	if(bWriter=="" || bWriter.trim()==""){
 		alert("작성자를 입력해주세요");
 		$("#bWriter").focus();
@@ -93,7 +108,7 @@ function ckValue(value){
 		alert("제목을 입력해주세요.");
 		$("#bSubject").focus();
 		return false;
-	}else if(summernote=="" || !pattern.test(summernote)){
+	}else if(summernote==""){
 		alert("내용을 입력해주세요");
 		$("#summernote").focus();
 		return false;
@@ -117,6 +132,12 @@ function listBrd(){
 	$("#listForm").attr("action", "/com/first/listBrd.do").submit();
 }
 
+//글 등록 했을시
+function insertListBrd(){
+	location.href="/com/first/listBrd.do";
+}
+
+
 
 function ajaxBrd(url, list){
 	$.ajax({
@@ -127,7 +148,7 @@ function ajaxBrd(url, list){
 		success : function(data){
 			if(data.reValue == "I"){
 				alert("글이 등록되었습니다.");
-				listBrd();
+				insertListBrd();
 			}else if(data.reValue=="U"){
 				alert("글이 수정되었습니다.");
 				goDetail(data.bNo);

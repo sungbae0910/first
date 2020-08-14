@@ -18,8 +18,7 @@ public class FirstServiceImpl implements FirstService{
 	/* 리스트 목록 */
 	@Override
 	public List<FirstVO> listBrd(PagingVO paging) {
-		List<FirstVO> vo = firstDAO.listBrd(paging);
-		return vo;
+		return firstDAO.listBrd(paging);
 	}
 
 	/* 게시물 총 갯수 */

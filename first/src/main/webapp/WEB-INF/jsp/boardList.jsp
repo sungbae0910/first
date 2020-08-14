@@ -109,14 +109,15 @@ $(document).ready(function() {
 					<li class="page-item"><a class="page-link"onclick="selChange(${paging.startPage-1})">Previous</a></li>
 				</c:if>
 				<c:forEach begin="${paging.startPage}" end="${paging.endPage}" var="p">
-					<c:choose>
+<%-- 					<c:choose>
 						<c:when test="${p == paging.nowPage}">
 							<li class="page-item active"><a class="page-link" href="#">${p}</a></li>
 						</c:when>
 						<c:when test="${p != paging.nowPage}">
 							<li class="page-item"><a class="page-link" href="#" onclick="selChange(${p})">${p}</a></li>
 						</c:when>
-					</c:choose>	
+					</c:choose>	 --%>
+					<li class="page-item ${(p==paging.nowPage)?'active':''} "><a class="page-link" href="#" onclick="selChange(${p})">${p}</a></li>
 				</c:forEach>
 				<c:if test="${paging.endPage != paging.lastPage}">
 					<li class="page-item"><a class="page-link" href="#" onclick="selChange(${paging.endPage+1})">Next</a></li>

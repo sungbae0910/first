@@ -36,45 +36,63 @@ public class FirstController {
 	@Autowired
 	private FirstService firstService;
 
+	
+	  /* 글 목록 */
+	  @RequestMapping(value = "/com/first/listBrd.do") 
+	  public String firstList(PagingVO paging, Model model) { 
+	  log.debug("글 목록 조회"); 
+	  int nowPage = paging.getNowPage(); 
+	  int cntPerPage = paging.getCntPerPage(); 
+	  String keyword = paging.getKeyword(); 
+	  String searchType = paging.getSearchType();
+	  
+	  int total = firstService.cntBrd(paging);
+	  
+	  if (nowPage == 0 && cntPerPage == 0) { 
+		  nowPage = 1; 
+		  cntPerPage = 5; 
+	  }else if(nowPage == 0) { 
+		  nowPage = 1; 
+	  }
+	  
+	  paging = new PagingVO(total, nowPage, cntPerPage, keyword, searchType);
+	  List<FirstVO> vo = firstService.listBrd(paging);
+	  
+	  model.addAttribute("paging", paging); 
+	  model.addAttribute("vo", vo);
+	  
+	  return "jsp/boardList"; 
+	  
+	  }
+	 
+
 	/* 글 목록 */
-	@RequestMapping(value = "/com/first/listBrd.do")
-	public String firstList(PagingVO paging, Model model) {
-		int nowPage = paging.getNowPage();
-		int cntPerPage = paging.getCntPerPage();
-		String keyword = paging.getKeyword();
-		String searchType = paging.getSearchType();
-
-		int total = firstService.cntBrd(paging);
-
-		if (nowPage == 0 && cntPerPage == 0) {
-			nowPage = 1;
-			cntPerPage = 5;
-		} else if (nowPage == 0) {
-			nowPage = 1;
-		} else if (cntPerPage == 0) {
-			cntPerPage = 5;
-		}
-
-		paging = new PagingVO(total, nowPage, cntPerPage, keyword, searchType);
-		List<FirstVO> vo = firstService.listBrd(paging);
-
-		model.addAttribute("paging", paging);
-		model.addAttribute("vo", vo);
-
-		return "boardList";
-	}
-
+	/*
+	 * @RequestMapping(value = "/com/first/listBrd.do") public String
+	 * firstList(@ModelAttribute("paging")FirstVO paging, Model model) {
+	 * log.debug("글 목록 조회"); int total = firstService.cntBrd(paging);
+	 * 
+	 * paging.calcLastPage(total, paging.getCntPerPage());
+	 * paging.calcStartEndPage(paging.getNowPage(), 5);
+	 * paging.calcStartEnd(paging.getNowPage(), paging.getCntPerPage());
+	 * 
+	 * List<FirstVO> vo = firstService.listBrd(paging);
+	 * 
+	 * model.addAttribute("paging", vo);
+	 * 
+	 * return "jsp/boardList"; }
+	 */
 	/* 입력화면 출력 */
 	@RequestMapping(value = "/com/insertView.do")
 	public String insertBoard(@ModelAttribute("paging") PagingVO paging) {
 
-		return "boardRegist";
+		return "jsp/boardRegist";
 	}
 
 	/* 글 입력 */
 	@RequestMapping(value = "/com/first/insertBrd.do")
 	@ResponseBody
-	public Object insertBrd(@ModelAttribute("paging") PagingVO paging, FirstVO vo) {
+	public Object insertBrd(FirstVO vo) {
 		int result = firstService.insertBrd(vo);
 
 		reValue = valuePro(result, "I");
@@ -84,32 +102,30 @@ public class FirstController {
 		return map;
 	}
 
-	
-	 /* 섬머노트 이미지 업로드 */
-	  @RequestMapping(value="/com/first/summernoteUpload.do")
-	  @ResponseBody 
-	  public Object summernoteUpload(MultipartHttpServletRequest req){ 
-		  String fileRoot = req.getSession().getServletContext().getRealPath("/summernoteImage/");
-		  MultipartFile file = req.getFile("file");
-	  
-		  String oriFileName = file.getOriginalFilename(); 
-		  String extension = oriFileName.substring(oriFileName.lastIndexOf(".")); //확장자 자르기 String
-		  String savedFileName = UUID.randomUUID() + extension;
-	  
-		  File targetFile = new File(fileRoot + savedFileName);
-		  System.out.println("fiel" + fileRoot);
-		  try { 
-			  InputStream fileStream = file.getInputStream();
-			  FileUtils.copyInputStreamToFile(fileStream, targetFile); 
-			  map.put("url", "/summernoteImage/"+savedFileName); 
-		  } catch(Exception e) { 
-			  FileUtils.deleteQuietly(targetFile); 
-			  map.put("resCode", "error"); 
-			  e.printStackTrace();
-		  }
-		  return map; 
-	  }
-	 
+	/* 섬머노트 이미지 업로드 */
+	@RequestMapping(value = "/com/first/summernoteUpload.do")
+	@ResponseBody
+	public Object summernoteUpload(MultipartHttpServletRequest req) {
+		String fileRoot = req.getSession().getServletContext().getRealPath("/summernoteImage/");
+		log.info(fileRoot);
+		MultipartFile file = req.getFile("file");
+
+		String oriFileName = file.getOriginalFilename();
+		String extension = oriFileName.substring(oriFileName.lastIndexOf(".")); // 확장자 자르기 String
+		String savedFileName = UUID.randomUUID() + extension;
+
+		File targetFile = new File(fileRoot + savedFileName);
+		try {
+			InputStream fileStream = file.getInputStream();
+			FileUtils.copyInputStreamToFile(fileStream, targetFile);
+			map.put("url", "/summernoteImage/" + savedFileName);
+		} catch (Exception e) {
+			FileUtils.deleteQuietly(targetFile);
+			map.put("resCode", "error");
+			e.printStackTrace();
+		}
+		return map;
+	}
 
 	/* 상세보기 */
 	@RequestMapping(value = "/com/first/detailBrd.do")
@@ -118,7 +134,7 @@ public class FirstController {
 
 		model.addAttribute("vo", vo);
 
-		return "boardDetail";
+		return "jsp/boardDetail";
 	}
 
 	/* 수정화면 */
@@ -128,7 +144,7 @@ public class FirstController {
 
 		model.addAttribute("vo", vo);
 
-		return "boardUpdate";
+		return "jsp/boardUpdate";
 	}
 
 	/* 수정 */

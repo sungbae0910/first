@@ -36,25 +36,6 @@ $(document).ready(function(){
 	
 	bindEvent();
 })
-
-function sendFile(file, editor){
-	alert("asd");
-	var form_data = new FormData();
-	form_data.append("file", file);
-	$.ajax({
-		data : form_data,
-		dataType : "json",
-		type : "POST",
-		url : "/com/first/summernoteUpload.do",
-		enctype : "multipart/form-data",
-		contentType : false,
-		processData : false,
-		success : function(data){
-			alert(data.url);
-			$(editor).summernote('insertImage', data.url);
-		}
-	});
-} 
 </script>
 </head>
 <body>

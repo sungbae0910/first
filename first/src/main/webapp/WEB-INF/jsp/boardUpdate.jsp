@@ -22,10 +22,19 @@ $(document).ready(function(){
 		maxHeight: null,
 		focus: true,
 		lang: "ko-KR",
+ 		callbacks : {
+			onImageUpload : function(files){
+				for(var i = files.length-1; i>=0; i--){
+					sendFile(files[i], this);
+				}
+			}
+		} 
 	});
 	
 	bindEvent();
 })
+
+
 </script>
 </head>
 <body>

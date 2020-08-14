@@ -1,8 +1,12 @@
 package com.first.service.impl;
 
+import java.util.List;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.first.service.FirstVO;
 
 public class AbstractDAO {
 	
@@ -48,7 +52,7 @@ public class AbstractDAO {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public Object selectList(String queryId, Object params) {
+	public List<FirstVO> selectList(String queryId, Object params) {
 		printQueryId(queryId);
 		return sqlSession.selectList(queryId, params);
 	}

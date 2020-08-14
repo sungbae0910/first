@@ -18,16 +18,15 @@ public class FirstDAO {
 	@Autowired
 	private SqlSessionTemplate sqlSession;
 	
-	protected void printQueryId(String queryId) {
-		if(log.isDebugEnabled()) {
-			log.debug("\t QueryId \t" + queryId);
-		}
-	}
 	
 	/* 게시물 목록 */
 	public List<FirstVO> listBrd(PagingVO paging){
-		List<FirstVO> vo = sqlSession.selectList("board.listBrd", paging);
-		return vo;
+		try {
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return sqlSession.selectList("board.listBrd", paging);
 	}
 	
 	/* 게시물 갯수 */

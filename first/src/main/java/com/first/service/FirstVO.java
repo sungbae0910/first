@@ -3,7 +3,7 @@ package com.first.service;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
-public class FirstVO {
+public class FirstVO extends PagingVO{
 
 	/* 글 번호 */
 	private int bNo = 0;
