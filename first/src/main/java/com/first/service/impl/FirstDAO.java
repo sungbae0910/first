@@ -20,42 +20,42 @@ public class FirstDAO {
 	
 	
 	/* 게시물 목록 */
-	public List<FirstVO> listBrd(PagingVO paging){
-		try {
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+	public List<FirstVO> listBrd(PagingVO paging) throws Exception{
 		return sqlSession.selectList("board.listBrd", paging);
 	}
 	
 	/* 게시물 갯수 */
-	public int cntBrd(PagingVO paging) {
+	public int cntBrd(PagingVO paging) throws Exception{
 		return sqlSession.selectOne("board.cntBrd", paging);
 	}
 
 	/* 게시물 입력 */
-	public int insertBrd(FirstVO vo) {
+	public int insertBrd(FirstVO vo) throws Exception{
 		return sqlSession.insert("board.insertBrd", vo);
 	}
 	
 	/* 상세보기 */
-	public FirstVO detailBrd(int bNo) {
+	public FirstVO detailBrd(int bNo) throws Exception{
+		return sqlSession.selectOne("board.detailBrd", bNo);
+	}
+	
+	/* 상세보기 조회수x */
+	public FirstVO detailBrd2(int bNo) throws Exception{
 		return sqlSession.selectOne("board.detailBrd", bNo);
 	}
 	
 	/* 조회수 증가 */
-	public void upCnt(int bNo){
+	public void upCnt(int bNo) throws Exception{
 		sqlSession.update("board.updateCnt", bNo);
 	}
 	
 	/* 수정 */
-	public int updateBrd(FirstVO vo) {
+	public int updateBrd(FirstVO vo) throws Exception{
 		return sqlSession.update("board.updateBrd", vo);
 	}
 	
 	/* 삭제 */
-	public int deleteBrd(int bNo){
+	public int deleteBrd(int bNo) throws Exception{
 		return sqlSession.delete("board.deleteBrd", bNo);
 	}
 	

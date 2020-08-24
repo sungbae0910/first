@@ -6,16 +6,26 @@
 	<!-- select -->
 	<select id="listBrd" resultType="com.first.service.FirstVO" parameterType="com.first.service.PagingVO">
 		<!-- select * from board	 -->
+		
 		select * from 
 			(
 				select ROWNUM RN, A.* from
 					(
 						select * from board
-						<include refid="search"></include>
-						order by bNo DESC
+						<if test="keyword != null">
+							<include refid="search"></include>
+						</if>
+						order by bNo desc
 						) A
 				)
-		where RN between #{start} and #{end}
+		where RN between #{start} and #{end} 
+		
+<!-- 			select * from 
+			(
+				select ROW_NUMBER() OVER (ORDER BY a.bNo asc) AS rown, A.* FROM board A
+						<include refid="search"></include>
+						)
+		where rown between #{start} and #{end} ORDER BY rown DESC -->
 	</select>
 	
 	<select id="cntBrd" resultType="int" parameterType="com.first.service.PagingVO">

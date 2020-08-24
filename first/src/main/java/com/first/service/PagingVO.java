@@ -5,25 +5,25 @@ public class PagingVO {
 	/* 현재페이지 */
 	private int nowPage = 1;
 	/* 시작페이지 */
-	private int startPage;
+	private int startPage = 0;
 	/* 끝페이지 */
-	private int endPage;
+	private int endPage = 0;
 	/* 총 게시글 갯수 */
-	private int total;
+	private int total = 0;
 	/* 페이지당 글 갯수 */
 	private int cntPerPage = 5;
 	/* 마지막페이지 */
-	private int lastPage;
+	private int lastPage = 0;
 	/* 쿼리에 쓰일 스타트넘버 */
-	private int start;
+	private int start = 0; 
 	/* 쿼리에 쓰일 라스트넘버 */
-	private int end;
+	private int end = 0;
 	/* 보여줄 칸수 */
 	private int cntPage = 5;
 	/* 검색방식 */
-	private String searchType;
+	private String searchType = "";
 	/* 키워드 */
-	private String keyword;
+	private String keyword = "";
 	
 	public PagingVO() {}
 	public PagingVO(int total, int nowPage, int cntPerPage, String keyword, String searchType) {
@@ -41,6 +41,7 @@ public class PagingVO {
 	//제일 마지막 페이지 
 	public void calcLastPage(int total, int cntPerPage) {
 		setLastPage((int) Math.ceil((double)total/(double)cntPerPage));
+		setTotal(total);
 	}
 	
 	// 현재 보이는 시작과 끝 계산
@@ -110,7 +111,6 @@ public class PagingVO {
 	public void setEnd(int end) {
 		this.end = end;
 	}
-	
 	public String getSearchType() {
 		return searchType;
 	}
@@ -122,6 +122,12 @@ public class PagingVO {
 	}
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+	@Override
+	public String toString() {
+		return "PagingVO [nowPage=" + nowPage + ", startPage=" + startPage + ", endPage=" + endPage + ", total=" + total
+				+ ", cntPerPage=" + cntPerPage + ", lastPage=" + lastPage + ", start=" + start + ", end=" + end
+				+ ", cntPage=" + cntPage + ", searchType=" + searchType + ", keyword=" + keyword + "]";
 	}
 	
 	

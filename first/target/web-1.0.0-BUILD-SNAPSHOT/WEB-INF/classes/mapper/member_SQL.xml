@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+
+	<!-- select -->
+	<select id="emailCk" parameterType="String" resultType="int">
+		select count(*) from users where id = #{value}
+	</select>
+	
+	<!-- insert -->
+	<insert id="membership" parameterType="com.login.service.MemberVO">
+		insert into users values(#{id}, #{password}, #{userName}, #{addr}, #{zipCode}, sysdate)
+	</insert>
+	
+</mapper>

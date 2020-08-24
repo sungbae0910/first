@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 
 public class FirstVO extends PagingVO{
 
-	/* 글 번호 */
+	/* 시퀀스번호  */
 	private int bNo = 0;
 	/* 글 제목 */
 	private String bSubject = "";
@@ -56,6 +56,15 @@ public class FirstVO extends PagingVO{
 	public void setbCnt(int bCnt) {
 		this.bCnt = bCnt;
 	}
+	
+	@Override
+	public String toString() {
+		return "FirstVO [bNo=" + bNo + ", bSubject=" + bSubject + ", bContent=" + bContent
+				+ ", bWriter=" + bWriter + ", bDate=" + bDate + ", bCnt=" + bCnt + "]";
+	}
+
+	
+
 	
 	
 	

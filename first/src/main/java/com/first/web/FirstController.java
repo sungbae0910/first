@@ -9,7 +9,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,59 +28,57 @@ import com.first.service.PagingVO;
 public class FirstController {
 	protected Logger log = LoggerFactory.getLogger(this.getClass());
 
-	JSONObject json = new JSONObject();
-	HashMap<String, Object> map = new HashMap<String, Object>();
-	String reValue = "";
-
 	@Autowired
 	private FirstService firstService;
 
-	
-	  /* 글 목록 */
-	  @RequestMapping(value = "/com/first/listBrd.do") 
-	  public String firstList(PagingVO paging, Model model) { 
-	  log.debug("글 목록 조회"); 
-	  int nowPage = paging.getNowPage(); 
-	  int cntPerPage = paging.getCntPerPage(); 
-	  String keyword = paging.getKeyword(); 
-	  String searchType = paging.getSearchType();
-	  
-	  int total = firstService.cntBrd(paging);
-	  
-	  if (nowPage == 0 && cntPerPage == 0) { 
-		  nowPage = 1; 
-		  cntPerPage = 5; 
-	  }else if(nowPage == 0) { 
-		  nowPage = 1; 
-	  }
-	  
-	  paging = new PagingVO(total, nowPage, cntPerPage, keyword, searchType);
-	  List<FirstVO> vo = firstService.listBrd(paging);
-	  
-	  model.addAttribute("paging", paging); 
-	  model.addAttribute("vo", vo);
-	  
-	  return "jsp/boardList"; 
-	  
-	  }
-	 
-
 	/* 글 목록 */
+	@RequestMapping(value = "/com/first/listBrd.do")
+	public String firstList(@ModelAttribute("paging") FirstVO pag, Model model) {
+		log.error("글 목록 조회");
+
+		try {
+			int total = firstService.cntBrd(pag);
+
+			pag.calcLastPage(total, pag.getCntPerPage());
+			pag.calcStartEndPage(pag.getNowPage(), 5);
+			pag.calcStartEnd(pag.getNowPage(), pag.getCntPerPage());
+
+			List<FirstVO> vo = firstService.listBrd(pag);
+
+			model.addAttribute("vo", vo);
+		} catch (Exception e) {
+			log.error("게시판 리스트 조회 중 오류발생");
+			e.printStackTrace();
+			model.addAttribute("exception", "게시판 리스트 조회 중 오류발생");
+			return "error/error";
+		}
+
+		return "jsp/boardList";
+	}
+
 	/*
+	 * 글 목록
+	 * 
 	 * @RequestMapping(value = "/com/first/listBrd.do") public String
-	 * firstList(@ModelAttribute("paging")FirstVO paging, Model model) {
-	 * log.debug("글 목록 조회"); int total = firstService.cntBrd(paging);
+	 * firstList(PagingVO paging, Model model) { log.debug("글 목록 조회"); int nowPage =
+	 * paging.getNowPage(); int cntPerPage = paging.getCntPerPage(); String keyword
+	 * = paging.getKeyword(); String searchType = paging.getSearchType();
 	 * 
-	 * paging.calcLastPage(total, paging.getCntPerPage());
-	 * paging.calcStartEndPage(paging.getNowPage(), 5);
-	 * paging.calcStartEnd(paging.getNowPage(), paging.getCntPerPage());
+	 * int total = firstService.cntBrd(paging);
 	 * 
+	 * if (nowPage == 0 && cntPerPage == 0) { nowPage = 1; cntPerPage = 5; }else
+	 * if(nowPage == 0) { nowPage = 1; }
+	 * 
+	 * paging = new PagingVO(total, nowPage, cntPerPage, keyword, searchType);
 	 * List<FirstVO> vo = firstService.listBrd(paging);
 	 * 
-	 * model.addAttribute("paging", vo);
+	 * model.addAttribute("paging", paging); model.addAttribute("vo", vo);
 	 * 
-	 * return "jsp/boardList"; }
+	 * return "jsp/boardList";
+	 * 
+	 * }
 	 */
+
 	/* 입력화면 출력 */
 	@RequestMapping(value = "/com/insertView.do")
 	public String insertBoard(@ModelAttribute("paging") PagingVO paging) {
@@ -93,11 +90,16 @@ public class FirstController {
 	@RequestMapping(value = "/com/first/insertBrd.do")
 	@ResponseBody
 	public Object insertBrd(FirstVO vo) {
-		int result = firstService.insertBrd(vo);
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		try {
+			firstService.insertBrd(vo);
 
-		reValue = valuePro(result, "I");
-
-		map.put("reValue", reValue);
+			map.put("reValue", "I");
+		} catch (Exception e) {
+			log.error("글 입력 중 오류발생");
+			e.printStackTrace();
+			map.put("reValue", "X");
+		}
 
 		return map;
 	}
@@ -106,6 +108,7 @@ public class FirstController {
 	@RequestMapping(value = "/com/first/summernoteUpload.do")
 	@ResponseBody
 	public Object summernoteUpload(MultipartHttpServletRequest req) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
 		String fileRoot = req.getSession().getServletContext().getRealPath("/summernoteImage/");
 		log.info(fileRoot);
 		MultipartFile file = req.getFile("file");
@@ -129,20 +132,47 @@ public class FirstController {
 
 	/* 상세보기 */
 	@RequestMapping(value = "/com/first/detailBrd.do")
-	public String detailBrd(@ModelAttribute("paging") PagingVO paging, HttpServletRequest req, Model model) {
-		FirstVO vo = firstService.detailBrd(Integer.parseInt(req.getParameter("bNo")));
-
-		model.addAttribute("vo", vo);
-
+	public String detailBrd(@ModelAttribute("paging") FirstVO vo, HttpServletRequest req, Model model) {
+//		FirstVO vo = firstService.detailBrd(Integer.parseInt(req.getParameter("bNo")));
+		try {
+			vo = firstService.detailBrd(vo.getbNo(), req);
+			model.addAttribute("vo", vo);
+		} catch (Exception e) {
+			log.error("상세보기 출력 중 오류발생");
+			e.printStackTrace();
+			model.addAttribute("exception", "상세보기 출력 중 오류발생");
+			return "error/error";
+		}
 		return "jsp/boardDetail";
 	}
 
+	/*
+	 * 상세보기 조회수 증가 x
+	 * 
+	 * @RequestMapping(value = "/com/first/detailBrd2.do") public String
+	 * detailBrd2(@ModelAttribute("paging") FirstVO vo, Model model) { // FirstVO vo
+	 * = firstService.detailBrd(Integer.parseInt(req.getParameter("bNo"))); try { vo
+	 * = firstService.detailBrd2(vo.getbNo()); model.addAttribute("vo", vo); } catch
+	 * (Exception e) { log.error("조회수 증가 중 오류발생"); e.printStackTrace();
+	 * model.addAttribute("exception", "상세보기 출력 중 오류발생"); return "error/error"; }
+	 * 
+	 * return "jsp/boardDetail"; }
+	 */
+
 	/* 수정화면 */
 	@RequestMapping(value = "/com/first/updateView.do")
-	public String updateView(@ModelAttribute("paging") PagingVO paging, HttpServletRequest req, Model model) {
-		FirstVO vo = firstService.detailBrd(Integer.parseInt(req.getParameter("bNo")));
+	public String updateView(@ModelAttribute("paging") FirstVO vo, Model model) {
+//		FirstVO vo = firstService.detailBrd(Integer.parseInt(req.getParameter("bNo")));
 
-		model.addAttribute("vo", vo);
+		try {
+			vo = firstService.detailBrd2(vo.getbNo());
+			model.addAttribute("vo", vo);
+		} catch (Exception e) {
+			log.error("수정화면 출력 중 오류발생");
+			e.printStackTrace();
+			model.addAttribute("exception", "수정화면 출력 중 오류발생");
+			return "error/error";
+		}
 
 		return "jsp/boardUpdate";
 	}
@@ -150,13 +180,19 @@ public class FirstController {
 	/* 수정 */
 	@RequestMapping(value = "/com/first/updateBrd.do")
 	@ResponseBody
-	public Object updateBrd(@ModelAttribute("paging") PagingVO paging, FirstVO vo) {
-		int result = firstService.updateBrd(vo);
+	public Object updateBrd(@ModelAttribute("paging") FirstVO vo) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		try {
+			firstService.updateBrd(vo);
 
-		reValue = valuePro(result, "U");
+			map.put("reValue", "U");
+			map.put("bNo", vo.getbNo());
 
-		map.put("reValue", reValue);
-		map.put("bNo", vo.getbNo());
+		} catch (Exception e) {
+			log.error("수정 중 오류발생");
+			e.printStackTrace();
+			map.put("reValue", "X");
+		}
 
 		return map;
 	}
@@ -164,23 +200,28 @@ public class FirstController {
 	/* 삭제 */
 	@RequestMapping(value = "/com/first/deleteBrd.do")
 	@ResponseBody
-	public Object deleteBrd(@ModelAttribute("paging") PagingVO paging, HttpServletRequest req) {
-		int result = firstService.deleteBrd(Integer.parseInt(req.getParameter("bNo")));
+	public Object deleteBrd(@ModelAttribute("paging") FirstVO vo) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		try {
+			firstService.deleteBrd(vo.getbNo());
 
-		reValue = valuePro(result, "D");
+			map.put("reValue", "D");
 
-		map.put("reValue", reValue);
+		} catch (Exception e) {
+			log.error("삭제 중 오류발생");
+			e.printStackTrace();
+			map.put("reValue", "X");
+		}
 
 		return map;
 	}
-
-	public String valuePro(int value, String guBun) {
-		String result = "";
-		if (value < 1) {
-			result = "X";
-		} else {
-			result = guBun;
-		}
-		return result;
+	/*
+	 * public String valuePro(int value, String guBun) { String result = ""; if
+	 * (value < 1) { result = "X"; } else { result = guBun; } return result; }
+	 */
+	/* 팝업창 */
+	@RequestMapping(value="/com/first/popup.do")
+	public String popup() {
+		return "jsp/popup/poptest";
 	}
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+
+	<!-- select -->
+	<select id="listBrd" resultType="com.first.service.FirstVO" parameterType="com.first.service.PagingVO">
+		<!-- select * from board	 -->
+		
+		select * from 
+			(
+				select ROWNUM RN, A.* from
+					(
+						select * from board
+						<include refid="search"></include>
+						order by bNo desc
+						) A
+				)
+		where RN between #{start} and #{end} 
+		
+<!-- 			select * from 
+			(
+				select ROW_NUMBER() OVER (ORDER BY a.bNo asc) AS rown, A.* FROM board A
+						<include refid="search"></include>
+						)
+		where rown between #{start} and #{end} ORDER BY rown DESC -->
+	</select>
+	
+	<select id="cntBrd" resultType="int" parameterType="com.first.service.PagingVO">
+		select count(*) from board <include refid="search"></include>
+	</select>
+	
+	<select id="detailBrd" resultType="com.first.service.FirstVO" parameterType="int">
+		select * from board where bNo = #{bNo}
+	</select>
+	
+	<!-- insert -->
+	<insert id="insertBrd" parameterType="com.first.service.FirstVO">
+		insert into board values(seq_board_bno.nextval, #{bSubject}, #{bContent}, #{bWriter}, sysdate, 0)
+	</insert>
+	
+	<!-- update -->
+	<update id="updateBrd" parameterType="com.first.service.FirstVO">
+		update board set bSubject=#{bSubject}, bContent=#{bContent}, bWriter=#{bWriter}, bDate=sysdate where bNo=#{bNo}	
+	</update>
+	
+	<update id="updateCnt" parameterType="int">
+		update board set bCnt=bCnt+1 where bNo=#{value}
+	</update>
+	
+	<!-- delete -->
+	<delete id="deleteBrd" parameterType="int">
+		delete from board where bNo = #{value}
+	</delete>
+
+
+	<!-- 동적쿼리 -->
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 'S'.toString()">where bSubject like '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'C'.toString()">where bContent like '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'W'.toString()">where bWriter like '%' || #{keyword} || '%'</if>
+		</if>
+	</sql>
+
+
+</mapper>
